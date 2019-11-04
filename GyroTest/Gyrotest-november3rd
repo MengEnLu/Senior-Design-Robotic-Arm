@@ -1,0 +1,75 @@
+
+//I was working with source code from Michael Schoeffler
+//next week I will do more with it
+#include "Wire.h" //allows you to use the I2C devices that
+//we are using for the gyroscope
+
+const int MPU_ADDR = 0x68; //I2C address of the MPU-6050.
+// If AD0 is set to high than the I2C address will be 0x69
+
+int16_t accelerometer_x; //variables that we set for acclerometer data
+int16_t accelerometer_y;
+int16_t accelerometer_z;
+int16_t gyro_x;   //same for the gyroscope data
+int16_t gyro_y;
+int16_t gyro_z;
+int16_t temperature;  //variables that can used for the temp. data
+
+char tmp_str[7]; // this is a variable that we will use for now to convert function
+
+//this branch statement will conver int16 to a string 
+char* convert_int16_to_str(int16_t i) {
+  sprintf(tmp_str, "%6d" , i);
+  return  tmp_str;
+}
+
+void setup() {
+  Serial.begin(9600); //generally recommended default
+  Wire.begin();
+  Wire.beginTransmission(MPU_ADDR); //begins with the transmission to I2C slave 
+  Wire.write(0x6B);  // getting permission to write into PWR_MGMT_1 register
+  Wire.write(0);  //getting set to 0 and also wakes up the MPU system
+  Wire.endTransmission(true);
+}
+
+void loop() {
+  Wire.beginTransmission(MPU_ADDR);
+  Wire.write(0x3B); //starts with the register 0x3B
+  Wire.endTransmission(false); //indicates that the Arduino will restart
+  Wire.requestFrom(MPU_ADDR, 7*2, true); //this requires a total of 
+  //14 registers from 7 *2
+
+  //bit shifting for high byte for first byte and low byte for second byte
+  //reading in two registers and storing them into the same variable from the 
+  //"Wire.read() << 8 | Wire.read
+  accelerometer_x = Wire.read() << 8 | Wire.read(); //reading registers : 0x3B
+  accelerometer_y = Wire.read() << 8 | Wire.read(); //reading registers : 0x3D
+  accelerometer_z = Wire.read() << 8 | Wire.read(); //reading registers : 0x3F
+  temperature = Wire.read() << 8 | Wire.read(); //reading registers : 0x41
+  gyro_x = Wire.read() << 8 | Wire.read(); //reading registers : 0x3B
+  gyro_y = Wire.read() << 8 | Wire.read(); //reading registers : 0x3B
+  gyro_z = Wire.read() << 8 | Wire.read(); //reading registers : 0x3B
+
+  //printing out the data
+  Serial.print("aX = ");
+  Serial.print(convert_int16_to_str(accelerometer_x));
+  Serial.print(" | aY = ");
+  Serial.print(convert_int16_to_str(accelerometer_y));
+  Serial.print(" | aZ = ");
+  Serial.print(convert_int16_to_str(accelerometer_z));
+
+  //the eqn I used here was from MPU-6000 documentation that I learned from a video
+  Serial.print(" | tmp = ");
+  Serial.print(convert_int16_to_str(temperature/340.00 + 36.53));
+
+  Serial.print(" | gX =  ");
+  Serial.print(convert_int16_to_str(gyro_x));
+  Serial.print(" | gY =  ");
+  Serial.print(convert_int16_to_str(gyro_y));
+  Serial.print(" | gZ =  ");
+  Serial.print(convert_int16_to_str(gyro_z));
+  Serial.println();
+
+  //delay
+  delay(1000);
+}
