@@ -9,9 +9,22 @@ void setup() {
   Wire.begin();
   mpu6050.begin();
   mpu6050.calcGyroOffsets(true);
+
+  Serial.print("Initializing");
+  delay(100);
+  Serial.print(" . ");
+  delay(100);
+    Serial.print(" . ");
+  delay(100);
+    Serial.print(" . ");
+  delay(100);
+    Serial.print(" . ");
+  delay(100);
 }
 
 void loop() {
+
+ 
   mpu6050.update();
   Serial.print("angleX : ");
   Serial.print(mpu6050.getAngleX());
