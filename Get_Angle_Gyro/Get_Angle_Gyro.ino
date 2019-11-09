@@ -1,13 +1,24 @@
 
+//Libraries
+//Libraries
+//-----------------------------------------------
 #include<MPU6050_tockn.h>
 #include <Wire.h>
 #include <Servo.h>
-
+//-----------------------------------------------
+//Servo Initializations
+//-----------------------------------------------
 Servo index;
 Servo middle;
 Servo RnP;
 Servo Thumb;
+//-----------------------------------------------
+//Gyro Init
+
 MPU6050 mpu6050(Wire);
+double angleX1 = 0;
+double angleY1 = 0;
+double angleZ1 = 0;
 
 
 int indexfPin = 0;
@@ -24,6 +35,7 @@ int thumbFlex = 0;
 void setup() {
   //Attaching Servos 
   // CONNECT ONLY TO PWM pins (~#)
+  //~3 and ~5 available 
   index.attach(9); 
   middle.attach(10);
   RnP.attach(11);
@@ -66,19 +78,18 @@ void loop() {
   thumbFlex = map(thumbFlex, 0, 1023,0,180);//Calibrate to map(finger, 0,1023, XXX,XXX
   Thumb.write(thumbFlex);
   //-----------------------------------------------------------------------------------------------
-
   //Gyroscope Data
   //-----------------------------------------------------------------------------------------------
   mpu6050.update();
-  //angleX1 = mpu6050.getAngleX(); //angle_1= Figure out the variable type
-  //angleY1 = mpu6050.getAngleY();
-  //angleZ1 = mpu6050.getAngleZ();
+  angleX1 = mpu6050.getAngleX(); //angle_1= Figure out the variable type
+  angleY1 = mpu6050.getAngleY();
+  angleZ1 = mpu6050.getAngleZ();
 
   Serial.print("angleX : ");
-  //Serial.print(angleX1);
+  Serial.print(angleX1);
   Serial.print("\tangleY : ");
-  //Serial.print(angleY1));
+  Serial.print(angleY1));
   Serial.print("\tangleZ : ");
-  //Serial.println(angleZ1);
+  Serial.println(angleZ1);
   //-----------------------------------------------------------------------------------------------
 }
