@@ -1,6 +1,5 @@
 
 //Libraries
-//Libraries
 //-----------------------------------------------
 #include<MPU6050_tockn.h>
 #include <Wire.h>
@@ -48,8 +47,8 @@ void setup() {
   
   Serial.begin(9600);
   Wire.begin();
-  mpu6050.begin(MPU6050_ADDR);
-  mpu6051.begin(MPU6050_ADDR);
+  mpu6050.begin();
+  mpu6051.begin();
   mpu6050.calcGyroOffsets(MPU6050_ADDR,true);
   mpu6051.calcGyroOffsets(MPU6050_ADDR2,true);
 
