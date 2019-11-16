@@ -16,10 +16,14 @@ Servo Thumb;
 //Gyro Init
 
 MPU6050 mpu6050(Wire);
-double angleX1 = 0;
-double angleY1 = 0;
-double angleZ1 = 0;
+MPU6050 mpu6051(Wire);
 
+double angleX1 = 0;
+double angleX2 = 0;
+double angleY1 = 0;
+double angleY2 = 0;
+double angleZ1 = 0;
+double angleZ2 = 0;
 
 int indexfPin = 0;
 int middlefPin = 1;
@@ -44,8 +48,10 @@ void setup() {
   
   Serial.begin(9600);
   Wire.begin();
-  mpu6050.begin();
-  mpu6050.calcGyroOffsets(true);
+  mpu6050.begin(MPU6050_ADDR);
+  mpu6051.begin(MPU6050_ADDR);
+  mpu6050.calcGyroOffsets(MPU6050_ADDR,true);
+  mpu6051.calcGyroOffsets(MPU6050_ADDR2,true);
 
   Serial.print("Initializing");
   delay(100);
@@ -80,7 +86,8 @@ void loop() {
   //-----------------------------------------------------------------------------------------------
   //Gyroscope Data
   //-----------------------------------------------------------------------------------------------
-  mpu6050.update();
+  mpu6050.update(MPU6050_ADDR);
+  mpu6051.update(MPU6050_ADDR2);
   angleX1 = mpu6050.getAngleX(); //angle_1= Figure out the variable type
   angleY1 = mpu6050.getAngleY();
   angleZ1 = mpu6050.getAngleZ();

@@ -21,12 +21,12 @@ class MPU6050{
   MPU6050(TwoWire &w);
   MPU6050(TwoWire &w, float aC, float gC);
 
-  void begin();
+  void begin(char address);
 
   void setGyroOffsets(float x, float y, float z);
 
-  void writeMPU6050(byte reg, byte data);
-  byte readMPU6050(byte reg);
+  void writeMPU6050(byte reg, byte data, char address);
+  byte readMPU6050(byte reg, char address);
 
   int16_t getRawAccX(){ return rawAccX; };
   int16_t getRawAccY(){ return rawAccY; };
@@ -48,13 +48,13 @@ class MPU6050{
   float getGyroY(){ return gyroY; };
   float getGyroZ(){ return gyroZ; };
 
-	void calcGyroOffsets(bool console = false, uint16_t delayBefore = 1000, uint16_t delayAfter = 3000);
+	void calcGyroOffsets(bool console = false, uint16_t delayBefore = 1000, uint16_t delayAfter = 3000, char address);
 
   float getGyroXoffset(){ return gyroXoffset; };
   float getGyroYoffset(){ return gyroYoffset; };
   float getGyroZoffset(){ return gyroZoffset; };
 
-  void update();
+  void update(char address);
 
   float getAccAngleX(){ return angleAccX; };
   float getAccAngleY(){ return angleAccY; };

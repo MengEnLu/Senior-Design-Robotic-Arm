@@ -13,13 +13,13 @@ MPU6050::MPU6050(TwoWire &w, float aC, float gC){
   gyroCoef = gC;
 }
 
-void MPU6050::begin(){
-  writeMPU6050(MPU6050_SMPLRT_DIV, 0x00);
-  writeMPU6050(MPU6050_CONFIG, 0x00);
-  writeMPU6050(MPU6050_GYRO_CONFIG, 0x08);
-  writeMPU6050(MPU6050_ACCEL_CONFIG, 0x00);
-  writeMPU6050(MPU6050_PWR_MGMT_1, 0x01);
-  this->update();
+void MPU6050::begin(char address){
+  writeMPU6050(MPU6050_SMPLRT_DIV, 0x00, address);
+  writeMPU6050(MPU6050_CONFIG, 0x00,address);
+  writeMPU6050(MPU6050_GYRO_CONFIG, 0x08,address);
+  writeMPU6050(MPU6050_ACCEL_CONFIG, 0x00,address);
+  writeMPU6050(MPU6050_PWR_MGMT_1, 0x01,address);
+  this->update(address);
   angleGyroX = 0;
   angleGyroY = 0;
   angleX = this->getAccAngleX();
@@ -27,18 +27,18 @@ void MPU6050::begin(){
   preInterval = millis();
 }
 
-void MPU6050::writeMPU6050(byte reg, byte data){
-  wire->beginTransmission(MPU6050_ADDR);
+void MPU6050::writeMPU6050(byte reg, byte data, char address){
+  wire->beginTransmission(address);
   wire->write(reg);
   wire->write(data);
   wire->endTransmission();
 }
 
-byte MPU6050::readMPU6050(byte reg) {
-  wire->beginTransmission(MPU6050_ADDR);
+byte MPU6050::readMPU6050(byte reg, char address) {
+  wire->beginTransmission(address);
   wire->write(reg);
   wire->endTransmission(true);
-  wire->requestFrom(MPU6050_ADDR, 1);
+  wire->requestFrom(address, 1);
   byte data =  wire->read();
   return data;
 }
@@ -49,7 +49,7 @@ void MPU6050::setGyroOffsets(float x, float y, float z){
   gyroZoffset = z;
 }
 
-void MPU6050::calcGyroOffsets(bool console, uint16_t delayBefore, uint16_t delayAfter){
+void MPU6050::calcGyroOffsets(char address, bool console, uint16_t delayBefore, uint16_t delayAfter){
 	float x = 0, y = 0, z = 0;
 	int16_t rx, ry, rz;
 
@@ -64,10 +64,10 @@ void MPU6050::calcGyroOffsets(bool console, uint16_t delayBefore, uint16_t delay
     if(console && i % 1000 == 0){
       Serial.print(".");
     }
-    wire->beginTransmission(MPU6050_ADDR);
+    wire->beginTransmission(address);
     wire->write(0x43);
     wire->endTransmission(false);
-    wire->requestFrom((int)MPU6050_ADDR, 6);
+    wire->requestFrom((int)address, 6);
 
     rx = wire->read() << 8 | wire->read();
     ry = wire->read() << 8 | wire->read();
@@ -93,11 +93,11 @@ void MPU6050::calcGyroOffsets(bool console, uint16_t delayBefore, uint16_t delay
 	}
 }
 
-void MPU6050::update(){
-	wire->beginTransmission(MPU6050_ADDR);
+void MPU6050::update(char address){
+	wire->beginTransmission(address);
 	wire->write(0x3B);
 	wire->endTransmission(false);
-	wire->requestFrom((int)MPU6050_ADDR, 14);
+	wire->requestFrom((int)address, 14);
 
   rawAccX = wire->read() << 8 | wire->read();
   rawAccY = wire->read() << 8 | wire->read();
