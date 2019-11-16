@@ -86,10 +86,10 @@ void loop() {
   angleZ1 = mpu6050.getAngleZ();
 
   Serial.print("angleX : ");
-  Serial.print(angleX1);
+  Serial.print(mpu6050.getAngleX());
   Serial.print("\tangleY : ");
-  Serial.print(angleY1));
+  Serial.print(mpu6050.getAngleY());
   Serial.print("\tangleZ : ");
-  Serial.println(angleZ1);
+  Serial.println(mpu6050.getAngleZ());
   //-----------------------------------------------------------------------------------------------
 }
