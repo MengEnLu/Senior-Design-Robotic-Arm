@@ -1,4 +1,5 @@
-
+unsigned char MPU6050_ADDR= 'h';
+unsigned char MPU6050_ADDR2='i';
 //Libraries
 //-----------------------------------------------
 #include<MPU6050_tockn.h>
@@ -85,8 +86,8 @@ void loop() {
   //-----------------------------------------------------------------------------------------------
   //Gyroscope Data
   //-----------------------------------------------------------------------------------------------
-  mpu6050.update(MPU6050_ADDR);
-  mpu6051.update(MPU6050_ADDR2);
+  mpu6050.update();
+  mpu6051.update();
   angleX1 = mpu6050.getAngleX(); //angle_1= Figure out the variable type
   angleY1 = mpu6050.getAngleY();
   angleZ1 = mpu6050.getAngleZ();
