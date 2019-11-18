@@ -1,5 +1,5 @@
-unsigned char MPU6050_ADDR= 'h';
-unsigned char MPU6050_ADDR2='i';
+
+//Libraries
 //Libraries
 //-----------------------------------------------
 #include<MPU6050_tockn.h>
@@ -17,13 +17,10 @@ Servo Thumb;
 
 MPU6050 mpu6050(Wire);
 MPU6050 mpu6051(Wire);
-
 double angleX1 = 0;
-double angleX2 = 0;
 double angleY1 = 0;
-double angleY2 = 0;
 double angleZ1 = 0;
-double angleZ2 = 0;
+
 
 int indexfPin = 0;
 int middlefPin = 1;
@@ -48,9 +45,9 @@ void setup() {
   
   Serial.begin(9600);
   Wire.begin();
-  mpu6050.begin();
-  mpu6051.begin();
-  mpu6050.calcGyroOffsets(MPU6050_ADDR,true);
+  mpu6050.begin(MPU6050_ADDR);
+  mpu6051.begin(MPU6050_ADDR2);
+  mpu6050.calcGyroOffsets(MPU6050_ADDR, true);
   mpu6051.calcGyroOffsets(MPU6050_ADDR2,true);
 
   Serial.print("Initializing");
@@ -86,8 +83,8 @@ void loop() {
   //-----------------------------------------------------------------------------------------------
   //Gyroscope Data
   //-----------------------------------------------------------------------------------------------
-  mpu6050.update();
-  mpu6051.update();
+  mpu6050.update('h');
+  mpu6051.update('i');
   angleX1 = mpu6050.getAngleX(); //angle_1= Figure out the variable type
   angleY1 = mpu6050.getAngleY();
   angleZ1 = mpu6050.getAngleZ();
@@ -98,5 +95,21 @@ void loop() {
   Serial.print(mpu6050.getAngleY());
   Serial.print("\tangleZ : ");
   Serial.println(mpu6050.getAngleZ());
+
+  angleX2 = mpu6051.getAngleX(); //angle_1= Figure out the variable type
+  angleY2 = mpu6051.getAngleY();
+  angleZ2 = mpu6051.getAngleZ();
+  Serial.print("\n");
+  Serial.print("\n");
+  Serial.print("angleX : ");
+  Serial.print(mpu6051.getAngleX());
+  Serial.print("\tangleY : ");
+  Serial.print(mpu6051.getAngleY());
+  Serial.print("\tangleZ : ");
+  Serial.println(mpu6051.getAngleZ());
+
+  Serial.print("\n");
+  Serial.print("\n");
+
   //-----------------------------------------------------------------------------------------------
 }
