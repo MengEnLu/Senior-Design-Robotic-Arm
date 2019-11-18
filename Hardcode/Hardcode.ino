@@ -286,7 +286,10 @@ void setup() {
     Serial.print(" . ");
   delay(100);
 }
-
+double wristRotation = 0;
+double thetaShoulderRot = 0;
+double phiShoulderRot = 0;
+double elbowRotation = 0;
 void loop() {
   //Finger Flexion Direct Control
   //-----------------------------------------------------------------------------------------------
@@ -314,25 +317,47 @@ void loop() {
   angleX1 = mpu6050.getAngleX(); //angle_1= Figure out the variable type
   angleY1 = mpu6050.getAngleY();
   angleZ1 = mpu6050.getAngleZ();
-
-  Serial.print("angleX : ");
-  Serial.print(mpu6050.getAngleX());
-  Serial.print("\tangleY : ");
-  Serial.print(mpu6050.getAngleY());
-  Serial.print("\tangleZ : ");
-  Serial.println(mpu6050.getAngleZ());
+//For debugging
+  //Serial.print("angleX : ");
+  //Serial.print(mpu6050.getAngleX());
+  //Serial.print("\tangleY : ");
+  //Serial.print(mpu6050.getAngleY());
+  //Serial.print("\tangleZ : ");
+  //Serial.println(mpu6050.getAngleZ());
 
   angleX2 = mpu6051.getAngleX(); //angle_1= Figure out the variable type
   angleY2 = mpu6051.getAngleY();
   angleZ2 = mpu6051.getAngleZ();
+
+  //Wrist Rotation
+  wristRotation = angleX1;
+  Serial.print("\t Wrist Rotation : ");
+  Serial.println(wristRotation);
+  //Elbow
+  elbowRotation = angleY1 - angleZ2;
+    Serial.print("\t Elbow : ");
+  Serial.println(elbowRotation);
+
+  //Shoulder
+  thetaShoulderRot= angleX2; //Azimuth
+  phiShoulderRot  = angleY2; //Longitudinal
+
+    Serial.print("\t Theta: ");
+  Serial.println(thetaShoulderRot);  
+  Serial.print("\t Phi : ");
+  Serial.println(phiShoulderRot);
+
+ 
+  
   Serial.print("\n");
   Serial.print("\n");
-  Serial.print("angleX : ");
-  Serial.print(mpu6051.getAngleX());
-  Serial.print("\tangleY : ");
-  Serial.print(mpu6051.getAngleY());
-  Serial.print("\tangleZ : ");
-  Serial.println(mpu6051.getAngleZ());
+//For debugging
+  //Serial.print("angleX : ");
+  //Serial.print(mpu6051.getAngleX());
+  //Serial.print("\tangleY : ");
+  //Serial.print(mpu6051.getAngleY());
+  //Serial.print("\tangleZ : ");
+  //Serial.println(mpu6051.getAngleZ());
 
   Serial.print("\n");
   Serial.print("\n");
