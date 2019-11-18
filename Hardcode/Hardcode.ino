@@ -308,8 +308,9 @@ void loop() {
   //-----------------------------------------------------------------------------------------------
   //Gyroscope Data
   //-----------------------------------------------------------------------------------------------
-  mpu6050.update('h');
-  mpu6051.update('i');
+  mpu6050.update('h');//Wrist
+  mpu6051.update('i');//Shoulder
+  
   angleX1 = mpu6050.getAngleX(); //angle_1= Figure out the variable type
   angleY1 = mpu6050.getAngleY();
   angleZ1 = mpu6050.getAngleZ();
@@ -324,13 +325,17 @@ void loop() {
   angleX2 = mpu6051.getAngleX(); //angle_1= Figure out the variable type
   angleY2 = mpu6051.getAngleY();
   angleZ2 = mpu6051.getAngleZ();
-
+  Serial.print("\n");
+  Serial.print("\n");
   Serial.print("angleX : ");
   Serial.print(mpu6051.getAngleX());
   Serial.print("\tangleY : ");
   Serial.print(mpu6051.getAngleY());
   Serial.print("\tangleZ : ");
   Serial.println(mpu6051.getAngleZ());
- delay(1000);
+
+  Serial.print("\n");
+  Serial.print("\n");
+
   //-----------------------------------------------------------------------------------------------
 }
