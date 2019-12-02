@@ -286,10 +286,10 @@ void setup() {
     Serial.print(" . ");
   delay(100);
 }
-double wristRotation = 0;
-double thetaShoulderRot = 0;
-double phiShoulderRot = 0;
-double elbowRotation = 0;
+int wristRotation = 0;
+int thetaShoulderRot = 0;
+int phiShoulderRot = 0;
+int elbowRotation = 0;
 void loop() {
   //Finger Flexion Direct Control
   //-----------------------------------------------------------------------------------------------
@@ -330,17 +330,17 @@ void loop() {
   angleZ2 = mpu6051.getAngleZ();
 
   //Wrist Rotation
-  wristRotation = angleX1;
+  wristRotation = (int) angleX1;
   Serial.print("\t Wrist Rotation : ");
   Serial.println(wristRotation);
   //Elbow
-  elbowRotation = angleY1 - angleZ2;
+  elbowRotation = (int) (angleY1 - angleZ2);
     Serial.print("\t Elbow : ");
   Serial.println(elbowRotation);
 
   //Shoulder
-  thetaShoulderRot= angleX2; //Azimuth
-  phiShoulderRot  = angleY2; //Longitudinal
+  thetaShoulderRot= (int) angleX2; //Azimuth
+  phiShoulderRot  = (int) angleY2; //Longitudinal
 
     Serial.print("\t Theta: ");
   Serial.println(thetaShoulderRot);  
