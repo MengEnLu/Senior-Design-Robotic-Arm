@@ -230,42 +230,45 @@ void MPU6050::update(unsigned char address){
 //-----------------------------------------------
 //Servo Initializations
 //-----------------------------------------------
-Servo index;
-Servo middle;
-Servo RnP;
-Servo Thumb;
+Servo ShoulderZ;
+Servo ShoulderX;
+Servo Elbow;
+Servo Wrist;
+
 //-----------------------------------------------
 //Gyro Init
 
 MPU6050 mpu6050(Wire);
 MPU6050 mpu6051(Wire);
+// -------------Raw values from Gyroscope------
+//Wrist Gyro
+double angleX1 = 0; //Directly controls wrist rotation
+double angleY1 = 0; //Elbow flexion comparator 1 + angle rotation --> ++angle of elbow(Needs to MULTIPLY and MAP values for correct angle rotations)... Map comparators from 0 to 1 for proportional control
+double angleZ1 = 0; //
 
-double angleX1 = 0;
 double angleX2 = 0;
-double angleY1 = 0;
 double angleY2 = 0;
-double angleZ1 = 0;
 double angleZ2 = 0;
+//--------------PINOUT for Servos---------------
+int ShoulderXpin = 3;
+int ShoulderZpin = 5;
+int Elbowpin = 6;
+int Wristpin = 9;
 
-int indexfPin = 0;
-int middlefPin = 1;
-int RnPfPin = 2;
-int thumbPin = 3;
-
-
-int indexFlex = 0;
-int middleFlex = 0;
-int RnPFlex = 0;
-int thumbFlex = 0;
+//-------------- Flexion angles-----------------
+int ShoulderZrot= 0;
+int ShoulderXrot = 0;
+int Elbowrot = 0;
+int Wristrot = 0;
 
 void setup() {
   //Attaching Servos 
   // CONNECT ONLY TO PWM pins (~#)
   //~3 and ~5 available 
-  index.attach(9); 
-  middle.attach(10);
-  RnP.attach(11);
-  Thumb.attach(6);
+  ShoulderZ.attach(ShoulderZpin); 
+  ShoulderX.attach(ShoulderXpin);
+  Elbow.attach(Elbowpin);
+  Wrist.attach(Wristpin);
 
   
   Serial.begin(9600);
@@ -293,74 +296,68 @@ int elbowRotation = 0;
 void loop() {
   //Finger Flexion Direct Control
   //-----------------------------------------------------------------------------------------------
-  indexFlex = analogRead(indexfPin);
-  indexFlex = map(indexFlex, 0, 1023,0,180); //Calibrate to map(finger, 0,1023, XXX,XXX) to get right rotation direction
-  index.write(indexFlex); 
+  //indexFlex = analogRead(indexfPin);
+  //indexFlex = map(indexFlex, 0, 1023,0,180); //Calibrate to map(finger, 0,1023, XXX,XXX) to get right rotation direction
+  //index.write(indexFlex); 
   
-  middleFlex = analogRead(middlefPin);
-  middleFlex = map(middleFlex, 0, 1023,0,180); //Calibrate to map(finger, 0,1023, XXX,XXX  
-  middle.write(middleFlex);
+  //middleFlex = analogRead(middlefPin);
+  //middleFlex = map(middleFlex, 0, 1023,0,180); //Calibrate to map(finger, 0,1023, XXX,XXX  
+  //middle.write(middleFlex);
   
-  RnPFlex = analogRead(RnPfPin);
-  RnPFlex = map(RnPFlex, 0, 1023,0,180);//Calibrate to map(finger, 0,1023, XXX,XXX
-  RnP.write(RnPFlex);
+  //RnPFlex = analogRead(RnPfPin);
+  //RnPFlex = map(RnPFlex, 0, 1023,0,180);//Calibrate to map(finger, 0,1023, XXX,XXX
+  //RnP.write(RnPFlex);
   
-  thumbFlex = analogRead(thumbPin);
-  thumbFlex = map(thumbFlex, 0, 1023,0,180);//Calibrate to map(finger, 0,1023, XXX,XXX
-  Thumb.write(thumbFlex);
+  //thumbFlex = analogRead(thumbPin);
+  //thumbFlex = map(thumbFlex, 0, 1023,0,180);//Calibrate to map(finger, 0,1023, XXX,XXX
+  //Thumb.write(thumbFlex);
   //-----------------------------------------------------------------------------------------------
   //Gyroscope Data
   //-----------------------------------------------------------------------------------------------
   mpu6050.update('h');//Wrist
   mpu6051.update('i');//Shoulder
-  
   angleX1 = mpu6050.getAngleX(); //angle_1= Figure out the variable type
   angleY1 = mpu6050.getAngleY();
   angleZ1 = mpu6050.getAngleZ();
-//For debugging
-  //Serial.print("angleX : ");
-  //Serial.print(mpu6050.getAngleX());
-  //Serial.print("\tangleY : ");
-  //Serial.print(mpu6050.getAngleY());
-  //Serial.print("\tangleZ : ");
-  //Serial.println(mpu6050.getAngleZ());
-
-  angleX2 = mpu6051.getAngleX(); //angle_1= Figure out the variable type
+  angleX2 = mpu6051.getAngleX();
   angleY2 = mpu6051.getAngleY();
   angleZ2 = mpu6051.getAngleZ();
-
-  //Wrist Rotation
-  wristRotation = (int) angleX1;
-  Serial.print("\t Wrist Rotation : ");
-  Serial.println(wristRotation);
-  //Elbow
-  elbowRotation = (int) (angleY1 - angleZ2);
-    Serial.print("\t Elbow : ");
-  Serial.println(elbowRotation);
-
-  //Shoulder
-  thetaShoulderRot= (int) angleX2; //Azimuth
-  phiShoulderRot  = (int) angleY2; //Longitudinal
-
-    Serial.print("\t Theta: ");
-  Serial.println(thetaShoulderRot);  
-  Serial.print("\t Phi : ");
-  Serial.println(phiShoulderRot);
-
- 
-  
-  Serial.print("\n");
-  Serial.print("\n");
+  //-----------------------------------------------------------------------------------------------
 //For debugging
-  //Serial.print("angleX : ");
-  //Serial.print(mpu6051.getAngleX());
-  //Serial.print("\tangleY : ");
-  //Serial.print(mpu6051.getAngleY());
-  //Serial.print("\tangleZ : ");
-  //Serial.println(mpu6051.getAngleZ());
+  //Serial.print("angleX : "); Serial.print(mpu6050.getAngleX()); Serial.print("\tangleY : "); Serial.print(mpu6050.getAngleY()); Serial.print("\tangleZ : "); Serial.println(mpu6050.getAngleZ());
+//-----------------------------------------------------------------------------------------------
+  //Control process
+//-----------------------------------------------------------------------------------------------
+  //---------------Wrist Rotation-----------------------
+  Wristrot = (int) angleX1; // Map values
+  Serial.print("\t Wrist Rotation : ");
+  Serial.print(Wristrot);
+  Serial.print("\n");
+  Wrist.write(Wristrot);
 
+  
+  //----------------Elbow-------------------------------
+  elbowRotation = (int) (angleY1 - angleZ2); //Map values
+  Serial.print("\t Elbow : ");
+  Serial.print(elbowRotation);
   Serial.print("\n");
+  Elbow.write(Elbowrot);
+
+  //----------------Shoulder----------------------------
+  ShoulderZrot = (int)(angleY2);// Map values
+  Serial.print("\t ShoulderZ Rotation: ");
+  Serial.print(ShoulderZrot);
   Serial.print("\n");
+  ShoulderZ.write(ShoulderZrot);
+
+  ShoulderXrot = (int)(angleZ2);
+  Serial.print("\t ShoulderX Rotation: ");
+  Serial.print(ShoulderXrot);
+  Serial.print("\n");
+  ShoulderX.write(ShoulderXrot);
+  
+//For debugging
+  //Serial.print("angleX : "); Serial.print(mpu6051.getAngleX()); Serial.print("\tangleY : "); Serial.print(mpu6051.getAngleY()); Serial.print("\tangleZ : "); Serial.println(mpu6051.getAngleZ()); Serial.print("\n");Serial.print("\n");
 
   //-----------------------------------------------------------------------------------------------
 }
