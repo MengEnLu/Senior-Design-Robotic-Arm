@@ -333,26 +333,27 @@ void loop() {
   Serial.print("\t Wrist Rotation : ");
   Serial.print(Wristrot);
   Serial.print("\n");
+  Wristrot = map(Wristrot, 180, -180, 0, 250);
   Wrist.write(Wristrot);
 
   
   //----------------Elbow-------------------------------
   elbowRotation = (int) (angleY1 - angleZ2); //Map values
-  Serial.print("\t Elbow : ");
-  Serial.print(elbowRotation);
+  //Serial.print("\t Elbow : ");
+  //Serial.print(elbowRotation);
   Serial.print("\n");
   Elbow.write(Elbowrot);
 
   //----------------Shoulder----------------------------
   ShoulderZrot = (int)(angleY2);// Map values
-  Serial.print("\t ShoulderZ Rotation: ");
-  Serial.print(ShoulderZrot);
+  //Serial.print("\t ShoulderZ Rotation: ");
+  //Serial.print(ShoulderZrot);
   Serial.print("\n");
   ShoulderZ.write(ShoulderZrot);
 
   ShoulderXrot = (int)(angleZ2);
-  Serial.print("\t ShoulderX Rotation: ");
-  Serial.print(ShoulderXrot);
+  //Serial.print("\t ShoulderX Rotation: ");
+  //Serial.print(ShoulderXrot);
   Serial.print("\n");
   ShoulderX.write(ShoulderXrot);
   
