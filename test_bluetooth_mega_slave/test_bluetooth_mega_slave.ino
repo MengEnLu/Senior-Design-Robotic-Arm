@@ -1,18 +1,30 @@
 //Mega Serial 1 TX1 pin 18
 //Mega Serial 1 RX1 pin 19
+#include "Servo.h"
+
 int dataArray[] ={0,0,0,0,0,0,0,0,0,0};
 int thumb_pos =dataArray[0];
 int index_pos = dataArray[1];
 int middle_pos = dataArray[2];
 int rp_pos = dataArray[3];
 
-int gy1_x = dataArray[4];
-int gy1_y = dataArray[5];
-int gy1_z = dataArray[6];
+int wrist = dataArray[4];
+int elbow = dataArray[5];
+int shoulder_x = dataArray[6];
+int shoulder_z = dataArray[7];
 
-int gy2_x = dataArray[7];
 int gy2_y = dataArray[8];
 int gy2_z = dataArray[9];
+
+//--servo----
+Servo Thumb;
+Servo Index;
+Servo Middle;
+Servo RP;
+Servo Wrist;
+Servo Elbow;
+Servo Shoulder_x;
+Servo Shoulder_z;
 
 void setup() {
   // put your setup code here, to run once:
@@ -22,7 +34,19 @@ void setup() {
   Serial1.begin(9600);  
   Serial.println("Arduino Mega serial 1 started at 9600");
   bluetoothSetUp();
-  Serial.print("Ready");
+
+//--servo---
+  Thumb.attach(3);
+  Index.attach(4);
+  Middle.attach(5);
+  RP.attach(6);
+  Wrist.attach(7);
+  Elbow.attach(8);
+  Shoulder_x.attach(9);
+  Shoulder_z.attach(10);
+  Serial.println("Servo Ready");
+  
+  Serial.println("ALL Ready");
 
 }
 
@@ -45,8 +69,8 @@ void loop() {
   //test
   //Serial.print("data String Ready: ");
   //Serial.println(dataStr);
+
   
-  //TO DO LIST:
   //INSERT FUNCTIONS TO EXTRACT DATA
   extractData(dataStr);
   assignVar();
@@ -54,13 +78,21 @@ void loop() {
   //test extract Data function
   test_Print_Extracted_Data();
   
+  //INSERT FUNCTIONS FOR SERVOS AND MOTORS HERE
+  Thumb.write(thumb_pos);
+  Index.write(index_pos);
+  Middle.write(middle_pos);
+  RP.write(rp_pos);
   
+  Wrist.write(wrist);
+  Elbow.write(elbow);
+  Shoulder_x.write(shoulder_x);
+  Shoulder_z.write(shoulder_z);
   
-   //TO DO LIST:
-  //INSERT FUNCTIONS FOR SERVOS AND MOTOR HERE
 
-  //test delay is set to 1.5 sec
-  delay(1500);
+  //delay is set to 0 sec
+  //delay(250);
+  
   clearBuffer();
   
 }
@@ -133,11 +165,11 @@ void assignVar(){
   middle_pos = dataArray[2];
   rp_pos = dataArray[3];
 
-  gy1_x = dataArray[4];
-  gy1_y = dataArray[5];
-  gy1_z = dataArray[6];
-
-  gy2_x = dataArray[7];
+  wrist = dataArray[4];
+  elbow = dataArray[5];
+  shoulder_x = dataArray[6];
+  shoulder_z = dataArray[7];
+  
   gy2_y = dataArray[8];
   gy2_z = dataArray[9];
 }
@@ -173,21 +205,6 @@ void extractData(String dataStr){
 }
 
 
-void assignVal(){
-   thumb_pos =dataArray[0];
-   index_pos = dataArray[1];
-   middle_pos = dataArray[2];
-   rp_pos = dataArray[3];
-
-   gy1_x = dataArray[4];
-   gy1_y = dataArray[5];
-   gy1_z = dataArray[6];
-
-   gy2_x = dataArray[7];
-   gy2_y = dataArray[8];
-   gy2_z = dataArray[9];
-}
-
 
 void test_Print_Extracted_Data(){
   Serial.print("thumb: ");
@@ -198,14 +215,15 @@ void test_Print_Extracted_Data(){
   Serial.print(middle_pos);
   Serial.print("\trp: ");
   Serial.print(rp_pos);
-  Serial.print("\tgy1_x: ");
-  Serial.print(gy1_x);
-  Serial.print("\tgy1_y: ");
-  Serial.print(gy1_y);
-  Serial.print("\tgy1_z: ");
-  Serial.print(gy1_z);
-  Serial.print("\tgy2_x: ");
-  Serial.print(gy2_x);
+  Serial.print("\twrist: ");
+  Serial.print(wrist);
+  Serial.print("\telbow: ");
+  Serial.print(elbow);
+  Serial.print("\tshoulder_x: ");
+  Serial.print(shoulder_x);
+  Serial.print("\tshoulder_z: ");
+  Serial.print(shoulder_z);
+  
   Serial.print("\tgy2_y: ");
   Serial.print(gy2_y);
   Serial.print("\tgy2_z: ");
