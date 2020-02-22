@@ -14,6 +14,7 @@
 #include "Wire.h"
 #include "Servo.h"
 
+String data = "";
 
 class MPU6050{
   public:
@@ -261,10 +262,15 @@ int ShoulderXrot = 0;
 int Elbowrot = 0;
 int Wristrot = 0;
 
+int thumbFlex = 0;
+int indexFlex = 0;
+int middleFlex = 0;
+int RnPFlex = 0;
 void setup() {
   //Attaching Servos 
   // CONNECT ONLY TO PWM pins (~#)
   //~3 and ~5 available 
+  
   ShoulderZ.attach(ShoulderZpin); 
   ShoulderX.attach(ShoulderXpin);
   Elbow.attach(Elbowpin);
@@ -293,15 +299,23 @@ int wristRotation = 0;
 int thetaShoulderRot = 0;
 int phiShoulderRot = 0;
 int elbowRotation = 0;
+//_--------Fingers----------
+int indexfPin = A0;
+int middlefPin = A1;
+int RnPfPin = A2;
+int thumbPin = A3;
+
+
+
 void loop() {
   //Finger Flexion Direct Control
   //-----------------------------------------------------------------------------------------------
-  //indexFlex = analogRead(indexfPin);
-  //indexFlex = map(indexFlex, 0, 1023,0,180); //Calibrate to map(finger, 0,1023, XXX,XXX) to get right rotation direction
+  indexFlex = analogRead(indexfPin);
+  indexFlex = map(indexFlex, 500, 1000,0,180); //Calibrate to map(finger, 0,1023, XXX,XXX) to get right rotation direction
   //index.write(indexFlex); 
   
-  //middleFlex = analogRead(middlefPin);
-  //middleFlex = map(middleFlex, 0, 1023,0,180); //Calibrate to map(finger, 0,1023, XXX,XXX  
+  middleFlex = analogRead(middlefPin);
+  middleFlex = map(middleFlex, 500, 1000,0,180); //Calibrate to map(finger, 0,1023, XXX,XXX  
   //middle.write(middleFlex);
   
   //RnPFlex = analogRead(RnPfPin);
@@ -330,9 +344,9 @@ void loop() {
 //-----------------------------------------------------------------------------------------------
   //---------------Wrist Rotation-----------------------
   Wristrot = (int) angleX1; // Map values
-  Serial.print("\t Wrist Rotation : ");
-  Serial.print(Wristrot);
-  Serial.print("\n");
+  //Serial.print("\t Wrist Rotation : ");
+  //Serial.print(Wristrot);
+ //Serial.print("\n");
   Wristrot = map(Wristrot, 180, -180, 0, 250);
   Wrist.write(Wristrot);
 
@@ -341,24 +355,31 @@ void loop() {
   elbowRotation = (int) (angleY1 - angleZ2); //Map values
   //Serial.print("\t Elbow : ");
   //Serial.print(elbowRotation);
-  Serial.print("\n");
+  //Serial.print("\n");
   Elbow.write(Elbowrot);
 
   //----------------Shoulder----------------------------
   ShoulderZrot = (int)(angleY2);// Map values
   //Serial.print("\t ShoulderZ Rotation: ");
   //Serial.print(ShoulderZrot);
-  Serial.print("\n");
-  ShoulderZ.write(ShoulderZrot);
+  //Serial.print("\n");
+  //ShoulderZ.write(ShoulderZrot);
 
   ShoulderXrot = (int)(angleZ2);
   //Serial.print("\t ShoulderX Rotation: ");
   //Serial.print(ShoulderXrot);
-  Serial.print("\n");
-  ShoulderX.write(ShoulderXrot);
+  //Serial.print("\n");
+  //ShoulderX.write(ShoulderXrot);
   
 //For debugging
   //Serial.print("angleX : "); Serial.print(mpu6051.getAngleX()); Serial.print("\tangleY : "); Serial.print(mpu6051.getAngleY()); Serial.print("\tangleZ : "); Serial.println(mpu6051.getAngleZ()); Serial.print("\n");Serial.print("\n");
 
   //-----------------------------------------------------------------------------------------------
+
+data = String('<'+ String(thumbFlex)+ '\t'+ String(indexFlex)+ '\t'
+                    + String(middleFlex)+'\t'+String(RnPFlex)+'\t'
+                    + String(Wristrot)+ '\t'+ String(Elbowrot)+ '\t'+ String(ShoulderZrot)+ '\t'
+                    + String(ShoulderXrot)+ '\t'+ String(0)+ '\t'+ String(0)+ ">\r\n");
+  
+  Serial.print(data);
 }
