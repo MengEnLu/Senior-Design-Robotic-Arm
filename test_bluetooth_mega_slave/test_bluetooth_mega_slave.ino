@@ -80,19 +80,23 @@ void loop() {
   
   //INSERT FUNCTIONS FOR SERVOS AND MOTORS HERE
   Thumb.write(thumb_pos);
+  delay(15);
   Index.write(index_pos);
+  delay(15);
   Middle.write(middle_pos);
+  delay(15);
   RP.write(rp_pos);
+  delay(15);
   
   Wrist.write(wrist);
+  delay(15);
   Elbow.write(elbow);
+  delay(15);
   Shoulder_x.write(shoulder_x);
+  delay(15);
   Shoulder_z.write(shoulder_z);
-  
-
-  //delay is set to 0 sec
-  //delay(250);
-  
+  delay(15);
+    
   clearBuffer();
   
 }
