@@ -271,17 +271,39 @@ int index_pos = 0;
 int middle_pos = 0;
 int rp_pos = 0;
 
-//-------------- Flexion angles-----------------
+//-----------Flex Sensor User Specified Boudaries-----------
+int thumb_max = 0;
+int index_max = 0;
+int middle_max = 0;
+int rp_max = 0;
+
+int thumb_min = 0;
+int index_min = 0;
+int middle_min = 0;
+int rp_min = 0;
+
+//--------- Flexion angles-----------------
 int ShoulderZrot= 0;
 int ShoulderXrot = 0;
 int Elbowrot = 0;
 int Wristrot = 0;
 
+//----------Data String-----------------
 String data = "";
+
+//-----------LED Init----------------
+const int buttonPin = 4;
+const int ledPin_gyro_init = 8;
+const int ledPin_zero_flex_init = 7;
+const int ledPin_full_flex_init = 6;
+const int ledPin_setup_complete = 5;
+
 
 void setup() {
 
   Serial.begin(9600);
+  led_init();
+  
   Wire.begin();
   mpu6050.begin('h');
   mpu6051.begin('i');
@@ -292,14 +314,31 @@ void setup() {
   delay(100);
   Serial.print(" . ");
   delay(100);
-    Serial.print(" . ");
+  Serial.print(" . ");
   delay(100);
-    Serial.print(" . ");
+  Serial.print(" . ");
   delay(100);
-    Serial.print(" . ");
+  Serial.println(" . ");
   delay(100);
-  
+
+  digitalWrite(ledPin_gyro_init,HIGH);
+  Serial.println("Gyro Init complete");
+
+  //Flex 0 degree Init
+  flex_zero_init();
+  Serial.println("Flex 0 degree Init Complete");
+  delay(500);
+
+  //Flex 180 Degree Init
+  full_flex_init();
+  Serial.println("Flex 180 degree Init Complete");
+
   Serial.println("Wireless Serial Communication Established!");
+  
+  //Setup Complete and Light up led
+  digitalWrite(ledPin_setup_complete, HIGH);
+  Print_Flex_Boundaries();
+  
   Serial.println("ALL Ready!");
 }
 
@@ -309,9 +348,9 @@ int phiShoulderRot = 0;
 int elbowRotation = 0;
 void loop() {
  
-  //-----------------------------------------------------------------------------------------------
+  //---------------------------------------------------------------
   //Gyroscope Data
-  //-----------------------------------------------------------------------------------------------
+  //------------------------------------------------------------
   mpu6050.update('h');//Wrist
   mpu6051.update('i');//Shoulder
   angleX1 = mpu6050.getAngleX(); //angle_1= Figure out the variable type
@@ -320,13 +359,13 @@ void loop() {
   angleX2 = mpu6051.getAngleX();
   angleY2 = mpu6051.getAngleY();
   angleZ2 = mpu6051.getAngleZ();
-  //-----------------------------------------------------------------------------------------------
+  //------------------------------------------------------
 
   //Control process
-  //-----------------------------------------------------------------------------------------------
+  //------------------------------------------------------
   //---------------Wrist Rotation-----------------------
   Wristrot = (int) angleX1; // Map values
-  Wristrot = map(Wristrot, 180, -180, 0, 250);
+  //Wristrot = map(Wristrot, 180, -180, 0, 250);
   //Wrist.write(Wristrot);
   
   //----------------Elbow-------------------------------
@@ -345,8 +384,83 @@ void loop() {
   makeDataString();
   Serial.print(data);
 }
+//---------------END OF LOOP-------------
+//---------------------------------------
 
 
+//----------------------------------------
+//--------------SETUP FUNCTIONS-----------
+void led_init(){
+  pinMode(buttonPin,INPUT);
+  pinMode(ledPin_gyro_init,OUTPUT);
+  pinMode(ledPin_zero_flex_init,OUTPUT);
+  pinMode(ledPin_full_flex_init,OUTPUT);
+  pinMode(ledPin_setup_complete,OUTPUT);
+
+  digitalWrite(ledPin_gyro_init,LOW);
+  digitalWrite(ledPin_zero_flex_init,LOW);
+  digitalWrite(ledPin_full_flex_init,LOW);
+  digitalWrite(ledPin_setup_complete,LOW);
+}
+
+
+void flex_zero_init(){
+  int buttonState = 0;
+  while(buttonState == LOW){
+      buttonState = digitalRead(buttonPin);
+      
+      if(buttonState == HIGH){
+         //INSERT CODE TO SAMPLE 0 FLEX ANALOG VALUE       
+          thumb_min = analogRead(thumbPin);
+          index_min = analogRead(indexPin);
+          middle_min = analogRead(middlePin);
+          rp_min = analogRead(rpPin);
+          
+
+        //turn on led for 0 flex
+        digitalWrite(ledPin_zero_flex_init, HIGH);
+      }
+  }
+}
+
+
+void full_flex_init(){
+  int buttonState = 0;
+  while(buttonState == LOW){
+    buttonState = digitalRead(buttonPin);
+    
+    if(buttonState == HIGH){
+        //INSERT CODE TO SAMPLE 180 FLEX ANALOG VALUE 
+          thumb_max = analogRead(thumbPin);
+          index_max = analogRead(indexPin);
+          middle_max = analogRead(middlePin);
+          rp_max = analogRead(rpPin);
+
+        //turn on led for 180 flex
+        digitalWrite(ledPin_full_flex_init,HIGH);
+    }
+  } 
+}
+
+
+void Print_Flex_Boundaries(){
+  Serial.print("thumb_min:\t");Serial.print(thumb_min);
+  Serial.print("\tthumb_max:\t");Serial.println(thumb_max);
+  Serial.print("index_min:\t");Serial.print(index_min);
+  Serial.print("\tindex_max:\t");Serial.println(index_max);
+  Serial.print("middle_min:\t");Serial.print(middle_min);
+  Serial.print("\tmiddle_max:\t");Serial.println(middle_max);
+  Serial.print("rp_min:\t\t");Serial.print(rp_min);
+  Serial.print("\trp_max:\t\t");Serial.println(rp_max);
+}
+//------------END OF SETUP FUNCTIONS------------
+//----------------------------------------------
+
+
+
+
+//------------------------------------------------
+//--------------------LOOP FUNCTIONS-----------------
 void getFlexPos(){
   int thumbVal = analogRead(thumbPin);
   int indexVal = analogRead(indexPin);
@@ -354,17 +468,50 @@ void getFlexPos(){
   int rpVal = analogRead(rpPin);
 
 
-  //MAPPING FLEX SENSOR VALUE
-  thumb_pos =map(thumbVal,320,520,-180, 180);
-  index_pos = map(indexVal,400,650,-180,180);
-  middle_pos = map(middleVal,400,650,-180,180);
-  rp_pos = map(rpVal,320,520,-180,180);
+  //Checking Boundary Conditions  
+  //Make sure analog reading doesn't exceed user specified range
+  if(thumbVal <= thumb_min){
+    thumbVal = thumb_min;
+  }
+  else if(thumbVal>= thumb_max){
+    thumbVal = thumb_max;
+  }
 
+  if(indexVal <= index_min){
+    indexVal = index_min;
+  }
+  else if(indexVal >= index_max){
+    indexVal = index_max;
+  }
+
+  if(middleVal <= middle_min){
+    middleVal = middle_min;
+  }
+  else if(middleVal >= middle_max){
+    middleVal = middle_max;
+  }
+
+  if(rpVal <= rp_min){
+    rpVal = rp_min;
+  }
+  else if(rpVal >= rp_max){
+    rpVal = rp_max;
+  }
+
+  
+  //MAPPING FLEX SENSOR VALUE
+  thumb_pos =map(thumbVal,thumb_min,thumb_max,0,180);
+  index_pos = map(indexVal,index_min,index_max,0,180);
+  middle_pos = map(middleVal,middle_min,middle_max,0,180);
+  rp_pos = map(rpVal,rp_min,rp_max,0,180);
 }
+
 
 void makeDataString(){
   data = String('<'+ String(thumb_pos)+ '\t'+ String(index_pos)+ '\t'
                     + String(middle_pos)+'\t'+String(rp_pos)+'\t'
                     + String(Wristrot)+ '\t'+ String(elbowRotation)+ '\t'+ String(ShoulderXrot)+ '\t'
-                    + String(ShoulderZrot)+ '\t'+ String(-1)+ '\t'+ String(-1)+ ">\r\n");
+                    + String(ShoulderZrot)+ '\t'+ String(0)+ '\t'+ String(0)+ ">\r\n");
 }
+//--------------END OF LOOP FUNCTIONS--------------
+//--------------------------------------------------
