@@ -293,6 +293,7 @@ String data = "";
 
 //-----------LED Init----------------
 const int buttonPin = 4;
+const int ledPin_setup_mode = 9;
 const int ledPin_gyro_init = 8;
 const int ledPin_zero_flex_init = 7;
 const int ledPin_full_flex_init = 6;
@@ -303,6 +304,11 @@ void setup() {
 
   Serial.begin(9600);
   led_init();
+  digitalWrite(ledPin_setup_mode,HIGH);
+  Serial.println("Entering Setup Mode");
+
+  Wait_to_Continue();
+
   
   Wire.begin();
   mpu6050.begin('h');
@@ -341,6 +347,8 @@ void setup() {
   
   Serial.println("ALL Ready!");
 }
+
+
 
 int wristRotation = 0;
 int thetaShoulderRot = 0;
@@ -392,17 +400,26 @@ void loop() {
 //--------------SETUP FUNCTIONS-----------
 void led_init(){
   pinMode(buttonPin,INPUT);
+  pinMode(ledPin_setup_mode,OUTPUT);
   pinMode(ledPin_gyro_init,OUTPUT);
   pinMode(ledPin_zero_flex_init,OUTPUT);
   pinMode(ledPin_full_flex_init,OUTPUT);
   pinMode(ledPin_setup_complete,OUTPUT);
 
+  digitalWrite(ledPin_setup_mode,LOW);
   digitalWrite(ledPin_gyro_init,LOW);
   digitalWrite(ledPin_zero_flex_init,LOW);
   digitalWrite(ledPin_full_flex_init,LOW);
   digitalWrite(ledPin_setup_complete,LOW);
 }
 
+
+void Wait_to_Continue(){
+  int buttonState = 0;
+  while(buttonState == LOW){
+    buttonState = digitalRead(buttonPin);    
+  }
+}
 
 void flex_zero_init(){
   int buttonState = 0;
