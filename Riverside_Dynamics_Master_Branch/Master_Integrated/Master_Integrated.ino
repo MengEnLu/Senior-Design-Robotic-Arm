@@ -119,7 +119,7 @@ void MPU6050::writeMPU6050(byte reg, byte data, char address){
   wire->beginTransmission(address);
   wire->write(reg);
   wire->write(data);
-  wire->endTransmission();
+  wire->endTransmission();                                                                                                                 
 }
 
 byte MPU6050::readMPU6050(byte reg, char address) {
@@ -307,7 +307,6 @@ void setup() {
   digitalWrite(ledPin_setup_mode,HIGH);
   Serial.println("Entering Setup Mode");
 
-  Wait_to_Continue();
 
   
   Wire.begin();
@@ -316,16 +315,6 @@ void setup() {
   mpu6050.calcGyroOffsets(MPU6050_ADDR,true);
   mpu6051.calcGyroOffsets(MPU6050_ADDR2,true);
 
-  Serial.print("Initializing");
-  delay(100);
-  Serial.print(" . ");
-  delay(100);
-  Serial.print(" . ");
-  delay(100);
-  Serial.print(" . ");
-  delay(100);
-  Serial.println(" . ");
-  delay(100);
 
   digitalWrite(ledPin_gyro_init,HIGH);
   Serial.println("Gyro Init complete");
@@ -341,11 +330,14 @@ void setup() {
 
   Serial.println("Wireless Serial Communication Established!");
   
-  //Setup Complete and Light up led
-  digitalWrite(ledPin_setup_complete, HIGH);
   Print_Flex_Boundaries();
-  
   Serial.println("ALL Ready!");
+  delay(500);
+
+  //To complete setup press the button
+  //The green light on indicate that setup is complete and the system is working.
+  Wait_to_Continue();
+  digitalWrite(ledPin_setup_complete, HIGH);
 }
 
 
@@ -373,17 +365,62 @@ void loop() {
   //------------------------------------------------------
   //---------------Wrist Rotation-----------------------
   Wristrot = (int) angleX1; // Map values
-  //Wristrot = map(Wristrot, 180, -180, 0, 250);
+  Wristrot = Wristrot+90;
+  Wristrot = 180 - Wristrot;
+  
+  if(Wristrot <= 0){
+    Wristrot = 0;
+  }else if(Wristrot >= 180){
+    Wristrot = 180;
+  }
+  
+
+  //test
+  //Wristrot = map(Wristrot, -90, 90, -180, 180);
   //Wrist.write(Wristrot);
   
   //----------------Elbow-------------------------------
-  elbowRotation = (int) (angleY1 - angleZ2); //Map values
+  
+  elbowRotation = (int) (-cos(angleX1/180)*angleY1 + sin(angleX1/180)*angleZ1+angleZ2); //Map values
+  elbowRotation = -elbowRotation;
+  /*
+  if(elbowRotation<= 0){
+    elbowRotation = 0;
+  }else if(elbowRotation >= 100){
+    elbowRotation =100;
+  }
+  */
+
+  //test
+  //elbowRotation = map(elbowRotation,-180, 180, -180, 180); 
   //Elbow.write(Elbowrot);
   
   //----------------Shoulder----------------------------
-  ShoulderZrot = (int)(angleY2);// Map values
+  ShoulderXrot = (int)(angleX2);// Map values
+  if(ShoulderXrot <= 0 ){
+    ShoulderXrot = 0;
+  }else if(ShoulderXrot >= 90){
+    ShoulderXrot = 90;
+  }
+
+  
+
+  //test shoulderZ
+  //ShoulderZrot= map(ShoulderZrot, -180, 180, -180, 180);
   //ShoulderZ.write(ShoulderZrot);
-  ShoulderXrot = (int)(angleZ2);
+  
+  ShoulderZrot = (int)(angleZ2);
+  //ShoulderZrot = ShoulderZrot;
+
+  if(ShoulderZrot <= 0){
+    ShoulderZrot = 0;
+  }else if(ShoulderZrot >= 90){
+    ShoulderZrot = 90;
+  }
+  
+  
+  //test shoulderX
+  //ShoulderXrot = map(ShoulderXrot, -180, 180, -180, 180);
   //ShoulderX.write(ShoulderXrot);
 
   //INSERT FUNCTIONS FOR GETTING FLEX SENSOR VALUE
@@ -517,7 +554,7 @@ void getFlexPos(){
 
   
   //MAPPING FLEX SENSOR VALUE
-  thumb_pos =map(thumbVal,thumb_min,thumb_max,0,180);
+  thumb_pos =map(thumbVal,thumb_min,thumb_max,180,0);
   index_pos = map(indexVal,index_min,index_max,0,180);
   middle_pos = map(middleVal,middle_min,middle_max,0,180);
   rp_pos = map(rpVal,rp_min,rp_max,0,180);
